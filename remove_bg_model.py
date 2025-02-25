@@ -7,14 +7,15 @@ import os
 def load_remove_bg_model():
     """Load the background removal ONNX model."""
     ONNX_MODEL_PATH = "models/mediapipe_selfie.onnx"
-    backend_path_nuget = "C:/Users/DFS/Desktop/gitrepo/nuget_packages/Microsoft.ML.OnnxRuntime.QNN.1.20.1/runtimes/win-x64/native/QnnHtp.dll"
-    backend_path_qnn_sdk = "C:/Users/DFS/Desktop/qnn_sdk/qairt/2.26.0.240828/lib/aarch64-windows-msvc/QnnHtp.dll"
-
+    backend_path_qnn_sdk = "C:/Qualcomm/AIStack/QAIRT/2.31.0.250130/lib/aarch64-windows-msvc/QnnHtp.dll"
+    backend_path_qnn_sdk2 = "C:/Users/DFS/Desktop/qnn_sdk/qairt/2.26.0.240828/lib/aarch64-windows-msvc/QnnHtp.dll"
+# sess_options = ort.SessionOptions()
+# sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
 # sess_options = ort.SessionOptions()
 # sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
 
     qnn_provider_options = {
-        "backend_path": backend_path_nuget
+        "backend_path": backend_path_qnn_sdk
     }
 
     try:
