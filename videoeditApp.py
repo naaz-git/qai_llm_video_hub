@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 from utils import make_dirs
 from remove_bg_model import load_remove_bg_model, apply_remove_bg_model_frame
 from upscale_model import load_upscale_model, apply_upscale_model_frame
+from hrnet_model import load_hrnet_model, apply_hrnet_model_frame
+
 from command_processor import process_command_with_gpt
 
 # Load environment variables
@@ -48,6 +50,8 @@ def process_command(command):
         return load_upscale_model(), "upscale"
     elif "remove background" in command.lower():
         return load_remove_bg_model(), "remove_bg"
+    elif "pose detection" in command.lower():  # Add HRNet handling
+        return load_hrnet_model(), "hrnet"
     else:
         raise ValueError("Unsupported command")
 
@@ -57,8 +61,16 @@ def apply_model(session, frame, model_type):
         return apply_upscale_model_frame(session, frame)
     elif model_type == "remove_bg":
         return apply_remove_bg_model_frame(session, frame)
+    elif model_type == "hrnet":
+        return apply_hrnet_model_frame(session, frame)  # Add HRNet handling
     else:
         raise ValueError("Unsupported model type")
+    
+def show_frames_side_by_side(st_frame, original_frame, resized_frame):
+    """Display original and resized frames side by side in Streamlit."""
+
+    # Show the images side by side using Streamlit
+    st_frame.image([original_frame, resized_frame], caption=["Original", "processed_frame"],  use_container_width=True)
 
 def start_video_processing(command, video_source):
     """Process the selected video source (uploaded file or webcam)."""
@@ -82,15 +94,18 @@ def start_video_processing(command, video_source):
             if not ret:
                 st.error("Failed to capture video. Check your webcam or file.")
                 break
-            
+
             # Process frame using selected model
             processed_frame = apply_model(session, frame, model_type)
 
             # Convert BGR to RGB for Streamlit display
+            original_frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             processed_frame = cv2.cvtColor(processed_frame, cv2.COLOR_BGRA2RGBA)
+            print(f'{processed_frame.shape=}')
 
             # Display the processed frame
-            st_frame.image(processed_frame, use_container_width=True)
+            #st_frame.image(processed_frame, use_container_width=True)
+            show_frames_side_by_side(st_frame, original_frame_rgb, processed_frame)
 
         cap.release()
     

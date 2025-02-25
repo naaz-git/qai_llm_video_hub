@@ -4,9 +4,19 @@ import numpy as np
 
 def load_upscale_model():
     """Load the image upscaling ONNX model."""
-    ONNX_MODEL_PATH = "models/esrgan.onnx"
+    ONNX_MODEL_PATH = "models/xlsr.onnx" #"models/esrgan.onnx"
+    backend_path_qnn_sdk = "C:/Qualcomm/AIStack/QAIRT/2.31.0.250130/lib/aarch64-windows-msvc/QnnHtp.dll"
+    backend_path_qnn_sdk2 = "C:/Users/DFS/Desktop/qnn_sdk/qairt/2.26.0.240828/lib/aarch64-windows-msvc/QnnHtp.dll"
+
+    qnn_provider_options = {
+        "backend_path": backend_path_qnn_sdk
+    }
+    # sess_options = ort.SessionOptions()
+    # sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+
     try:
-        session = ort.InferenceSession(ONNX_MODEL_PATH)
+        session = ort.InferenceSession(ONNX_MODEL_PATH, providers= [("QNNExecutionProvider",qnn_provider_options),"CPUExecutionProvider"],
+    )
         print('Image upscaling model loaded.')
         return session
     except Exception as e:
@@ -34,8 +44,9 @@ def apply_upscale_model_frame(session, frame):
         output_tensor = outputs[0][0]
         output_tensor = np.transpose(output_tensor, (1, 2, 0))
         output_tensor = (output_tensor * 255).clip(0, 255).astype(np.uint8)
-
-        return cv2.cvtColor(output_tensor, cv2.COLOR_RGB2BGR)  # Convert to BGR for OpenCV
+        return cv2.cvtColor(output_tensor, cv2.COLOR_RGB2BGR)  # Convert to BGR for OpenCV '''
     except Exception as e:
         print(f"🚨 Error applying upscaling model: {e}")
         return frame  # Return original frame in case of error
+    
+
